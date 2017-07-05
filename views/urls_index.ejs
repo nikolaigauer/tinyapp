@@ -8,7 +8,7 @@
   <ul>
     <% for (var key in urlDatabase) { %>
       <li> value/URL: <%= urlDatabase[key] %>,  key/Short: <%= key %>    </li>
-       <a href='/'>Blank Link</a>
+       <a href='/urls/<%= key%>'>Edit</a>
     <% } %>
   </ul>
 
