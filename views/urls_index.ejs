@@ -10,12 +10,17 @@
 
   <ul>
     <% for (var key in urlDatabase) { %>
-      <li> key/Short: <%= key %>,  value/URL: <a href='/urls/<%= key %>'> <%= urlDatabase[key] %> </a> </li>
-        <form method="POST" action='/urls/<%= key%>/delete'>
-        <button type="submit">DELETE</button>
+      <li>
+        <div>key/Short: <%= key %></div>
+        <div>value/URL: <a href='/u/<%= key %>'> <%= urlDatabase[key] %> </a> </div>
+        <div><form><input type='text' value="<%= 'localhost:8080/u/' + key %>"></form></div>
+        <form method="GET" action='/urls/<%= key %>'>
+          <button type="submit">EDIT</button>
         </form>
-      <!-- <a href='<%= urlDatabase[key] %>'><% urlDatabase[key]%></a> -->
-
+        <form method="POST" action='/urls/<%= key%>/delete'>
+          <button type="submit">DELETE</button>
+        </form>
+      </li>
     <% } %>
   </ul>
 

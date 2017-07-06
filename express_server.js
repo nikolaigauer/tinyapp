@@ -32,27 +32,35 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 
-app.post("/urls/:id/delete", (req, res) => {
+// app.get("/urls/:id/show", (req, res) => {
+//   const templateVars = {shortURL: req.params.id, longURL: urlDatabase[req.params.id] };
+//   res.render("urls_show", templateVars);
+// });
 
+app.post("/urls/:id/delete", (req, res) => {
   delete urlDatabase[req.params.id]
   console.log(urlDatabase, req.params.id)
-  // if (deleteURL === undefined) {
-  //   res.status(404).send("Seems like there is nothing to delete");
-  // } else {
   res.redirect("/urls")
-  // }
 });
 
 app.get("/urls/:id", (req, res) => {
   const templateVars = {shortURL: req.params.id, longURL: urlDatabase[req.params.id] };
-    // res.render("urls_show", templateVars);
-    res.redirect(urlDatabase[req.params.id]); // <------ redirecting to the URL rather than rendering a show page
-
+  res.render("urls_show", templateVars);
+  // res.redirect(urlDatabase[req.params.id]);  // <------ redirecting to the URL rather than rendering a show page
 });
+
+app.post("/urls/:id", (req, res) => {
+  var newLongURL = req.body.longURL;
+  urlDatabase[newLongURL]
+  // remember error checking
+  res.redirect("/urls");
+});
+
 
 app.post("/urls", (req, res) => {
   var shortURL = rando();
-  urlDatabase[shortURL] = req.body.longURL
+  var longURL = req.body.longURL;
+  urlDatabase[shortURL] = longURL;
   console.log(req.body.longURL);
   res.redirect("/urls/" + shortURL);
 
@@ -60,8 +68,7 @@ app.post("/urls", (req, res) => {
 
 app.get("/u/:shortURL", (req, res) => {
   let longURL = urlDatabase[req.params.shortURL]
-   res.redirect(longURL);
-
+  res.redirect(longURL);
 });
 
 
