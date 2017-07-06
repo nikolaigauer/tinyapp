@@ -45,10 +45,15 @@ app.post("/urls", (req, res) => {
 });
 
 app.get("/u/:shortURL", (req, res) => {
-  console.log(req)
   let longURL = urlDatabase[req.params.shortURL]
    res.redirect(longURL);
 
+});
+
+app.post("/urls/:id", (req, res) => {
+  let deleteURL = urlDatabase[req.params.key]
+  delete deleteURL
+  res.redirect("/urls")
 });
 
 app.get("/hello", (req, res) => {
