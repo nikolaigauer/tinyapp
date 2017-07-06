@@ -32,10 +32,21 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 
+app.post("/urls/:id/delete", (req, res) => {
+
+  delete urlDatabase[req.params.id]
+  console.log(urlDatabase, req.params.id)
+  // if (deleteURL === undefined) {
+  //   res.status(404).send("Seems like there is nothing to delete");
+  // } else {
+  res.redirect("/urls")
+  // }
+});
+
 app.get("/urls/:id", (req, res) => {
   const templateVars = {shortURL: req.params.id, longURL: urlDatabase[req.params.id] };
     // res.render("urls_show", templateVars);
-    res.redirect(urlDatabase[req.params.id]);
+    res.redirect(urlDatabase[req.params.id]); // <------ redirecting to the URL rather than rendering a show page
 
 });
 
@@ -53,11 +64,7 @@ app.get("/u/:shortURL", (req, res) => {
 
 });
 
-app.post("/urls/:id/delete", (req, res) => {
-  let deleteURL = {longURL: urlDatabase[req.params.id]}
-  delete deleteURL
-  res.redirect("/urls")
-});
+
 
 app.get("/hello", (req, res) => {
   res.end("<html><body>Hello <b>World</b></body></html>\n");
