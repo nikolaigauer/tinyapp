@@ -1,5 +1,7 @@
 var express = require("express");
 var app = express();
+var cookieParser = require('cookie-parser')
+
 var PORT = process.env.PORT || 8080; // default port 8080
 
 app.set("view engine", "ejs");
@@ -36,6 +38,11 @@ app.get("/urls/new", (req, res) => {
 //   const templateVars = {shortURL: req.params.id, longURL: urlDatabase[req.params.id] };
 //   res.render("urls_show", templateVars);
 // });
+app.post("/login", (req, res) => {
+  username =
+
+});
+
 
 app.post("/urls/:id/delete", (req, res) => {
   delete urlDatabase[req.params.id]
