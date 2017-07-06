@@ -40,8 +40,10 @@ app.get("/urls/:id", (req, res) => {
 
 
 app.post("/urls", (req, res) => {
+  var shortURL = rando();
+  urlDatabase[shortURL] = req.body.longURL
   console.log(req.body.longURL);  // debug statement to see POST parameters
-  res.send("Ok");         // Respond with 'Ok' (we will replace this)
+  res.redirect("/urls/" + shortURL);         // Respond with 'Ok' (we will replace this)
 });
 
 app.get("/hello", (req, res) => {
