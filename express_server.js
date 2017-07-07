@@ -37,7 +37,10 @@ app.get("/urls", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  let templateVars = {
+    username: req.cookies["username"]
+  };
+  res.render("urls_new", templateVars);
 });
 
 // app.get("/urls/:id/show", (req, res) => {
@@ -45,9 +48,13 @@ app.get("/urls/new", (req, res) => {
 //   res.render("urls_show", templateVars);
 // });
 app.post("/login", (req, res) => {
-  console.log(req.body)
   res.cookie("username", req.body.username)
   res.redirect("/urls");
+});
+
+app.post("/logout", (req, res) => {
+  res.clearCookie("username")
+res.redirect("/urls")
 });
 
 
@@ -58,7 +65,11 @@ app.post("/urls/:id/delete", (req, res) => {
 });
 
 app.get("/urls/:id", (req, res) => {
-  const templateVars = {shortURL: req.params.id, longURL: urlDatabase[req.params.id] };
+  let templateVars = {
+    username: req.cookies["username"],
+    shortURL: req.params.id,
+    longURL: urlDatabase[req.params.id]
+  };
   res.render("urls_show", templateVars);
   // res.redirect(urlDatabase[req.params.id]);  // <------ redirecting to the URL rather than rendering a show page
 });
