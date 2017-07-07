@@ -26,9 +26,21 @@ var urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+const users = {
+  "userRandomID": {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur"
+  },
+ "user2RandomID": {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk"
+  }
+}
 
 app.get("/urls", (req, res) => {
-  console.log(req)
+  // console.log(req)
   let templateVars = {
     urlDatabase: urlDatabase,
     username: req.cookies["username"]
@@ -57,6 +69,39 @@ app.post("/logout", (req, res) => {
 res.redirect("/urls")
 });
 
+app.get("/register", (req, res) => {
+  let templateVars = {
+    username: req.cookies["username"]
+  }
+  res.render("urls_registration", templateVars)
+});
+
+function isEmailTaken(email) {
+  for (var userID in users) {
+    if ( email === users[userID].email) {
+      return true;
+    }
+  }
+  return false;
+}
+
+app.post("/register", (req, res) => {
+  let password = req.body.password
+  let email = req.body.email
+  let userID = rando()
+   if (!req.body.password || !req.body.email) {
+    console.log("400 error");
+    res.status(400).send('You goofed! Please input a valid email and password');
+  } else if (isEmailTaken(email)) {
+    console.log("400 error");
+    res.status(400).send("Email already registered!");
+  } else {
+  users[userID] = {id: userID, email: email, password: password}
+  res.cookie("user_ID", req.body.email)
+  console.log(users)
+  res.redirect("/urls")
+  }
+});
 
 app.post("/urls/:id/delete", (req, res) => {
   delete urlDatabase[req.params.id]
@@ -81,7 +126,6 @@ app.post("/urls/:id", (req, res) => {
   res.redirect("/urls");
 });
 
-
 app.post("/urls", (req, res) => {
   var shortURL = rando();
   var longURL = req.body.longURL;
@@ -95,8 +139,6 @@ app.get("/u/:shortURL", (req, res) => {
   let longURL = urlDatabase[req.params.shortURL]
   res.redirect(longURL);
 });
-
-
 
 app.get("/hello", (req, res) => {
   res.end("<html><body>Hello <b>World</b></body></html>\n");
