@@ -73,20 +73,23 @@ app.get("/login", (req, res) => {
   };
 });
 
-function isEmailTaken(email) {
-  for (var userID in users) {
-    if ( email === users[userID].email) {
-      return true;
-    };
-  }
-  return false;
-}
-
 app.post("/login", (req, res) => {
   let password = req.body.password
   let email = req.body.email
-  res.cookie("user_ID", user)
-  res.redirect("/urls");
+  if (!req.body.password || !req.body.email) {
+    console.log("403 error");
+    res.status(403).send('You goofed AGAIN!! Please input a valid email and password');
+  } else if (!isEmailTaken(email)) {
+    console.log("403 error");
+    res.status(403).send('THat email is not in our database');
+  } else if (passwordCheck(email, password)) {
+    let user = passwordCheck(email, password)
+    res.cookie("user_ID", user.id)
+    res.redirect("/urls");
+  } else {
+    console.log("403 error");
+    res.status(403).send("SORRY, THE EMAIL AND PASSWORD DO NAWT MATCH!")
+  }
 });
 
 app.post("/logout", (req, res) => {
@@ -170,8 +173,28 @@ app.get("/", (req, res) => {
 
 app.get("/urls.json", (req, res) =>{
   res.json(urlDatabase);
-})
+});
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
+
+function passwordCheck(email, password) {
+  for (var userID in users) {
+    if (email === users[userID].email) {
+      if (password === users[userID].password) {
+        return users[userID];
+      }
+    return false;
+    }
+  }
+}
+
+function isEmailTaken(email) {
+  for (var userID in users) {
+    if (email === users[userID].email) {
+      return true;
+    };
+  }
+  return false;
+}
