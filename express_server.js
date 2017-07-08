@@ -39,18 +39,20 @@ const users = {
   }
 }
 
+
+
 app.get("/urls", (req, res) => {
   // console.log(req)
   let templateVars = {
     urlDatabase: urlDatabase,
-    username: req.cookies["username"]
-    };
+    user: users[req.cookies["user_ID"]]
+  };
   res.render("urls_index", templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
   let templateVars = {
-    username: req.cookies["username"]
+    user: users[req.cookies["user_ID"]]
   };
   res.render("urls_new", templateVars);
 });
@@ -59,36 +61,54 @@ app.get("/urls/new", (req, res) => {
 //   const templateVars = {shortURL: req.params.id, longURL: urlDatabase[req.params.id] };
 //   res.render("urls_show", templateVars);
 // });
-app.post("/login", (req, res) => {
-  res.cookie("username", req.body.username)
-  res.redirect("/urls");
-});
-
-app.post("/logout", (req, res) => {
-  res.clearCookie("username")
-res.redirect("/urls")
-});
-
-app.get("/register", (req, res) => {
+app.get("/login", (req, res) => {
+  // let password = req.body.password
   let templateVars = {
-    username: req.cookies["username"]
-  }
-  res.render("urls_registration", templateVars)
+    user: users[req.cookies["user_ID"]]
+  };
+  if (req.cookies["user_ID"]) {
+    res.redirect("/urls")
+  } else {
+    res.render("urls_login", templateVars)
+  };
 });
 
 function isEmailTaken(email) {
   for (var userID in users) {
     if ( email === users[userID].email) {
       return true;
-    }
+    };
   }
   return false;
 }
+
+app.post("/login", (req, res) => {
+  let password = req.body.password
+  let email = req.body.email
+  res.cookie("user_ID", user)
+  res.redirect("/urls");
+});
+
+app.post("/logout", (req, res) => {
+  console.log("LETS GO creeyy")
+  res.clearCookie("user_ID")
+  res.redirect("/login")
+});
+
+app.get("/register", (req, res) => {
+  let templateVars = {
+    user: users[req.cookies["user_ID"]]
+  }
+  res.render("urls_registration", templateVars)
+});
+
+
 
 app.post("/register", (req, res) => {
   let password = req.body.password
   let email = req.body.email
   let userID = rando()
+  // console.log(passsword, email, userID)
    if (!req.body.password || !req.body.email) {
     console.log("400 error");
     res.status(400).send('You goofed! Please input a valid email and password');
@@ -97,7 +117,7 @@ app.post("/register", (req, res) => {
     res.status(400).send("Email already registered!");
   } else {
   users[userID] = {id: userID, email: email, password: password}
-  res.cookie("user_ID", req.body.email)
+  res.cookie("user_ID", userID)
   console.log(users)
   res.redirect("/urls")
   }
@@ -111,7 +131,7 @@ app.post("/urls/:id/delete", (req, res) => {
 
 app.get("/urls/:id", (req, res) => {
   let templateVars = {
-    username: req.cookies["username"],
+    user: users[req.cookies["user_ID"]],
     shortURL: req.params.id,
     longURL: urlDatabase[req.params.id]
   };

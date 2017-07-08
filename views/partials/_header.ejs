@@ -2,14 +2,11 @@
     <div>tinyApp (header)</div>
 </header>
 
-<% if(username){ %>
-    <div><%= username %></div>
-    <form action="/logout" method="POST">
-        <button type="submit">Log out</button>
-    </form>
-<% } else{ %>
-    <form action="/login" method="POST">
-        <input name="username">
-        <button type="submit">Log in</button>
-    </form>
+<% if (user) { %>
+  <form method="POST" action="/logout" >
+    <input type="submit" value="log out if you wish">
+  </form>
+<% } else { %>
+  <div><a href="/register"> REGISTER </a></div>
+  <a href="/login"> LOG IN </a>
 <% } %>
