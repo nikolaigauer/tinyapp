@@ -1,8 +1,10 @@
 <header>
     <div>tinyApp (header)</div>
-</header>
+
 
 <% if (user) { %>
+
+  <%= user.email %>
   <form method="POST" action="/logout" >
     <input type="submit" value="log out if you wish">
   </form>
@@ -10,3 +12,4 @@
   <div><a href="/register"> REGISTER </a></div>
   <a href="/login"> LOG IN </a>
 <% } %>
+</header>
