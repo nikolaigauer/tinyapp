@@ -21,13 +21,18 @@
             <%= urlDatabase[shortURL].longURL %>
           </a>
         </div>
+        <div>
+          OWNER ID:
+          <%= urlDatabase[shortURL].userID %>
+        </div>
 
-        <!-- <div>
+        <div>
           <form>
             <input type='text' value="<%= 'localhost:8080/u/' + shortURL %>">
           </form>
-        </div> -->
+        </div>
 
+        <% if (user === urlDatabase[shortURL].userID) { %>
         <form method="GET" action='/urls/<%= shortURL %>'>
           <button type="submit">EDIT</button>
         </form>
@@ -35,7 +40,8 @@
         <form method="POST" action='/urls/<%= shortURL%>/delete'>
           <button type="submit">DELETE</button>
         </form>
-
+        <% } %>
+        <hr>
       </li>
     <% } %>
   </ul>

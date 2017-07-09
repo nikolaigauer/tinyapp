@@ -25,22 +25,22 @@ let urlDatabase = {
   "b2xVn2": {
     id: "b2xVn2",
     longURL: "http://www.lighthouselabs.ca",
-    userID: "userRandomID"
+    userID: "ran"
   },
   "9sm5xK": {
     id: "9sm5xK",
     longURL: "http://www.google.com",
-    userID: "user2RandomID"
+    userID: "ran"
   }
 };
 
 
 
 let users = {
-  "userRandomID": {
-    id: "userRandomID",
+  "ran": {
+    id: "ran",
     email: "user@example.com",
-    password: "purple-monkey-dinosaur"
+    password: "do"
   },
  "user2RandomID": {
     id: "user2RandomID",
@@ -52,8 +52,8 @@ let users = {
 app.get("/urls", (req, res) => {
 
   let templateVars = {
-    urlDatabase: urlDatabase,
-    user: users[req.cookies["user_ID"]]
+    urlDatabase: urlsForUser(req.cookies["user_ID"]),
+    user: req.cookies["user_ID"]
   };
   res.render("urls_index", templateVars);
 });
@@ -142,26 +142,31 @@ app.post("/register", (req, res) => {
 });
 
 app.post("/urls/:id/delete", (req, res) => {
-  delete urlDatabase[req.params.id]
-  console.log(urlDatabase, req.params.id)
-  res.redirect("/urls")
+  if (req.cookies["user_ID"] === urlDatabase[req.params.id].userID) {
+    delete urlDatabase[req.params.id]
+    res.redirect("/urls")
+  } else {
+    res.status(550).send("You can't do that");
+  }
 });
 
 app.get("/urls/:id", (req, res) => {
-  console.log("This has LOADED!", req.params.id)
-  let templateVars = {
-    user: users[req.cookies["user_ID"]],
-    shortURL: req.params.id,
-    longURL: urlDatabase[req.params.id].longURL
-  };
-  res.render("urls_show", templateVars);
-  // res.redirect(urlDatabase[req.params.id]);  // <------ redirecting to the URL rather than rendering a show page
-});
+  if (req.cookies["user_ID"] === urlDatabase[req.params.id].userID) {
+    let templateVars = {
+      user: users[req.cookies["user_ID"]],
+      shortURL: req.params.id,
+      longURL: urlDatabase[req.params.id].longURL
+    };
+    res.render("urls_show", templateVars);
+  } else {
+    res.status(550).send("You can't do that");
+  }
+ });
 
 app.post("/urls/:id", (req, res) => {
   var newLongURL = req.body.longURL;
-  urlDatabase[newLongURL]
-  console.log("this is from the post urls :id section: " + urlDatabase[newLongURL])
+  urlDatabase[req.params.id].longURL = newLongURL;
+  console.log("this is from the post urls :id section: " + urlDatabase[newLongURL]);
   res.redirect("/urls");
 });
 
@@ -211,11 +216,17 @@ function isEmailTaken(email) {
   for (var userID in users) {
     if (email === users[userID].email) {
       return true;
-    };
+    }
   }
   return false;
 }
 
 function urlsForUser(id) {
-
+  let userURLs = {};
+  for (var urlKey in urlDatabase) {
+    if ( id === urlDatabase[urlKey].userID) {
+      userURLs[urlKey] = urlDatabase[urlKey];
+    }
+  }
+  return userURLs;
 }
