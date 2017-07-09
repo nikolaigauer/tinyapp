@@ -21,12 +21,22 @@ const rando = () => {
   return output;
 }
 
-var urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+let urlDatabase = {
+  "b2xVn2": {
+    id: "b2xVn2",
+    longURL: "http://www.lighthouselabs.ca",
+    userID: "userRandomID"
+  },
+  "9sm5xK": {
+    id: "9sm5xK",
+    longURL: "http://www.google.com",
+    userID: "user2RandomID"
+  }
 };
 
-const users = {
+
+
+let users = {
   "userRandomID": {
     id: "userRandomID",
     email: "user@example.com",
@@ -37,12 +47,10 @@ const users = {
     email: "user2@example.com",
     password: "dishwasher-funk"
   }
-}
-
-
+};
 
 app.get("/urls", (req, res) => {
-  // console.log(req)
+
   let templateVars = {
     urlDatabase: urlDatabase,
     user: users[req.cookies["user_ID"]]
@@ -63,11 +71,8 @@ app.get("/urls/new", (req, res) => {
 
 app.post("/urls/new", (req, res) => {
   let templateVars = {
-
     user: users[req.cookies["user_ID"]],
     urlDatabase: userID
-
-
   };
 
   res.redirect("/urls/new", templateVars);
@@ -143,10 +148,11 @@ app.post("/urls/:id/delete", (req, res) => {
 });
 
 app.get("/urls/:id", (req, res) => {
+  console.log("This has LOADED!", req.params.id)
   let templateVars = {
     user: users[req.cookies["user_ID"]],
     shortURL: req.params.id,
-    longURL: urlDatabase[req.params.id]
+    longURL: urlDatabase[req.params.id].longURL
   };
   res.render("urls_show", templateVars);
   // res.redirect(urlDatabase[req.params.id]);  // <------ redirecting to the URL rather than rendering a show page
@@ -156,40 +162,25 @@ app.post("/urls/:id", (req, res) => {
   var newLongURL = req.body.longURL;
   urlDatabase[newLongURL]
   console.log("this is from the post urls :id section: " + urlDatabase[newLongURL])
-  // remember error checking
   res.redirect("/urls");
 });
 
 app.post("/urls", (req, res) => {
   var shortURL = rando();
-  console.log("Short URL: " + shortURL)
   let longURL = req.body.longURL; // < ---- input of long URL
-  urlDatabase[shortURL] = longURL; // <---- this makes the key shortURL and the value longURL
-  let urlPair = urlDatabase[shortURL][longURL] // don't think this does anything
   let userID = req.cookies["user_ID"] // < ---- logged in user's ID
-    console.log("urlPair: " + urlPair)
-  // urlDatabase[userID] = uniqURLDatabase /// what is this doing?
-  urlDatabase[userID] = {} // Pushing an object into urlDatabase?
-  urlDatabase[userID][shortURL] = longURL // pushing an object AND a key value pair into urlDatabase
-  console.log("long URL: " + longURL); // < ------ input of new URL
-  console.log("userID: " + userID)
-  console.log("urlDatabase[userID]: " + urlDatabase[userID])
-
-  // users[userID] = {id: userID, email: email, password: password}
-
-
-  console.log(urlDatabase)
+  urlDatabase[shortURL] = {id: shortURL, longURL: longURL, userID: userID};
+  console.log(urlDatabase);
   res.redirect("/urls/" + shortURL);
-
 });
 
 app.get("/u/:shortURL", (req, res) => {
-  let longURL = urlDatabase[req.params.shortURL]
+  let longURL = urlDatabase[req.params.shortURL].longURL
   res.redirect(longURL);
 });
 
 app.get("/hello", (req, res) => {
-  res.end("<html><body>Hello <b>World</b></body></html>\n");
+  res.end(`<html><body>Hello <b>World</b></body></html>\n`);
 });
 
 app.get("/", (req, res) => {
@@ -204,6 +195,7 @@ app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
 
+// Helper functions below:
 function passwordCheck(email, password) {
   for (var userID in users) {
     if (email === users[userID].email) {
