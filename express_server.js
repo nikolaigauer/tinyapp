@@ -54,13 +54,25 @@ app.get("/urls/new", (req, res) => {
   let templateVars = {
     user: users[req.cookies["user_ID"]]
   };
-  res.render("urls_new", templateVars);
+  if (req.cookies["user_ID"]) {
+    res.render("urls_new", templateVars)
+  } else {
+    res.render("urls_login", templateVars)
+  };
 });
 
-// app.get("/urls/:id/show", (req, res) => {
-//   const templateVars = {shortURL: req.params.id, longURL: urlDatabase[req.params.id] };
-//   res.render("urls_show", templateVars);
-// });
+app.post("/urls/new", (req, res) => {
+  let templateVars = {
+
+    user: users[req.cookies["user_ID"]],
+    urlDatabase: userID
+
+
+  };
+
+  res.redirect("/urls/new", templateVars);
+});
+
 app.get("/login", (req, res) => {
   // let password = req.body.password
   let templateVars = {
@@ -78,22 +90,22 @@ app.post("/login", (req, res) => {
   let email = req.body.email
   if (!req.body.password || !req.body.email) {
     console.log("403 error");
-    res.status(403).send('You goofed AGAIN!! Please input a valid email and password');
+    res.status(403).send('Please input a valid email and password');
   } else if (!isEmailTaken(email)) {
     console.log("403 error");
-    res.status(403).send('THat email is not in our database');
+    res.status(403).send('The input email is not in our database');
   } else if (passwordCheck(email, password)) {
     let user = passwordCheck(email, password)
     res.cookie("user_ID", user.id)
     res.redirect("/urls");
   } else {
     console.log("403 error");
-    res.status(403).send("SORRY, THE EMAIL AND PASSWORD DO NAWT MATCH!")
+    res.status(403).send("The email and password does not seem to match")
   }
 });
 
 app.post("/logout", (req, res) => {
-  console.log("LETS GO creeyy")
+  console.log("Kenny Loggins out")
   res.clearCookie("user_ID")
   res.redirect("/login")
 });
@@ -104,8 +116,6 @@ app.get("/register", (req, res) => {
   }
   res.render("urls_registration", templateVars)
 });
-
-
 
 app.post("/register", (req, res) => {
   let password = req.body.password
@@ -145,15 +155,30 @@ app.get("/urls/:id", (req, res) => {
 app.post("/urls/:id", (req, res) => {
   var newLongURL = req.body.longURL;
   urlDatabase[newLongURL]
+  console.log("this is from the post urls :id section: " + urlDatabase[newLongURL])
   // remember error checking
   res.redirect("/urls");
 });
 
 app.post("/urls", (req, res) => {
   var shortURL = rando();
-  var longURL = req.body.longURL;
-  urlDatabase[shortURL] = longURL;
-  console.log(req.body.longURL);
+  console.log("Short URL: " + shortURL)
+  let longURL = req.body.longURL; // < ---- input of long URL
+  urlDatabase[shortURL] = longURL; // <---- this makes the key shortURL and the value longURL
+  let urlPair = urlDatabase[shortURL][longURL] // don't think this does anything
+  let userID = req.cookies["user_ID"] // < ---- logged in user's ID
+    console.log("urlPair: " + urlPair)
+  // urlDatabase[userID] = uniqURLDatabase /// what is this doing?
+  urlDatabase[userID] = {} // Pushing an object into urlDatabase?
+  urlDatabase[userID][shortURL] = longURL // pushing an object AND a key value pair into urlDatabase
+  console.log("long URL: " + longURL); // < ------ input of new URL
+  console.log("userID: " + userID)
+  console.log("urlDatabase[userID]: " + urlDatabase[userID])
+
+  // users[userID] = {id: userID, email: email, password: password}
+
+
+  console.log(urlDatabase)
   res.redirect("/urls/" + shortURL);
 
 });
@@ -197,4 +222,8 @@ function isEmailTaken(email) {
     };
   }
   return false;
+}
+
+function urlsForUser(id) {
+
 }

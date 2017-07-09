@@ -1,12 +1,15 @@
 <header>
-    <div>tinyApp (header)</div>
+<div>tinyApp (header)</div>
 
 
 <% if (user) { %>
 
   <%= user.email %>
-  <form method="POST" action="/logout" >
+  <form method="POST" action="/logout">
     <input type="submit" value="log out if you wish">
+  </form>
+  <form method="GET" action="/urls/new">
+    <input type="submit" value="Make a new short URL">
   </form>
 <% } else { %>
   <div><a href="/register"> REGISTER </a></div>
