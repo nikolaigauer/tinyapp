@@ -26,11 +26,11 @@
           <%= urlDatabase[shortURL].userID %>
         </div>
 
-        <div>
-          <form>
-            <input type='text' value="<%= 'localhost:8080/u/' + shortURL %>">
-          </form>
-        </div>
+          <div>
+            <form>
+              <input type='text' value="<%= 'localhost:8080/u/' + shortURL %>">
+            </form>
+          </div>
 
         <% if (user === urlDatabase[shortURL].userID) { %>
         <form method="GET" action='/urls/<%= shortURL %>'>
