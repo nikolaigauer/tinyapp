@@ -1,9 +1,9 @@
 "use strict"
+
 var express = require("express");
 var app = express();
-// var cookieParser = require('cookie-parser')
-var cookieSession = require('cookie-session')
-const bcrypt = require('bcrypt')
+var cookieSession = require('cookie-session');
+const bcrypt = require('bcrypt');
 
 var PORT = process.env.PORT || 8080; // default port 8080
 
@@ -14,11 +14,8 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieSession({
   name: 'session',
   secret: "o3rng57fvs8wnolh",
-  // keys: [ secret keys ],
-
-  // Cookie Options
   maxAge: 24 * 60 * 60 * 1000 // 24 hours
-}))
+}));
 
 const rando = () => {
   const letters = 'abcdefghijklmnopqrstuvwxyz'
@@ -29,7 +26,7 @@ const rando = () => {
     output += alphabet[Math.floor(Math.random() * alphabet.length)];
   }
   return output;
-}
+};
 
 let urlDatabase = {
   "b2xVn2": {
@@ -84,7 +81,6 @@ app.post("/urls/new", (req, res) => {
     user: users[req.session["user_ID"]],
     urlDatabase: userID
   };
-
   res.redirect("/urls/new", templateVars);
 });
 
@@ -102,30 +98,15 @@ app.get("/login", (req, res) => {
 app.post("/login", (req, res) => {
   let password = req.body.password;
   let email = req.body.email;
-
-
-  // let saltRounds = 10;
-  // var salt = bcrypt.genSaltSync(saltRounds);
-  // var hash = bcrypt.hashSync(password, salt);
-  // console.log(hash);
-  // let hashed_password = (bcrypt.compareSync(password, 10))
-
-//   if (bcrypt.compareSync(password, hash)) {
-//   console.log("The password is a match!");
-// } else {
-//   console.log("You suck at passwords.");
-// }
-// console.log(bcrypt.compareSync(password, hashed_password)); // hashed_password need to refer to the object it is stored in
-
   if (!req.body.password || !req.body.email) {
     console.log("403 error");
     res.status(403).send('Please input a valid email and password');
   } else if (!isEmailTaken(email)) {
     console.log("403 error");
     res.status(403).send('The input email is not in our database');
-  } else if (passwordCheck(email, password)) { // replaced password with hash
+  } else if (passwordCheck(email, password)) { 
     let user = passwordCheck(email, password);
-    req.session.user_ID = user.id; //<---- not defined!! see windows original, have changed
+    req.session.user_ID = user.user;
     res.redirect("/urls");
   } else {
     console.log("403 error");
@@ -136,43 +117,36 @@ app.post("/login", (req, res) => {
 app.post("/logout", (req, res) => {
   console.log("Kenny Loggins out");
   req.session = null;
-  res.redirect("/login")
+  res.redirect("/login");
 });
 
 app.get("/register", (req, res) => {
   let templateVars = {
     user: users[req.session["user_ID"]]
   }
-  res.render("urls_registration", templateVars)
+  res.render("urls_registration", templateVars);
 });
 
 app.post("/register", (req, res) => {
-  const password = req.body.password; // you will probably this from req.params
+  const password = req.body.password;
   const hashed_password = bcrypt.hashSync(password, 10);
-  console.log("this is hashed pw: " + hashed_password);
-
-let saltRounds = 10;
-var salt = bcrypt.genSaltSync(saltRounds);
-var hash = bcrypt.hashSync(password, salt);
-console.log("this is hash: " + hash);
-console.log("this is password and hash: " + bcrypt.compareSync(password, hash));
-
-  // let password = req.body.password;
+  let saltRounds = 10;
+  let salt = bcrypt.genSaltSync(saltRounds);
+  let hash = bcrypt.hashSync(password, salt);
   let email = req.body.email;
   let userID = rando();
-  // console.log(passsword, email, userID)
-   if (!req.body.password || !req.body.email) {
-    console.log("400 error");
-    res.status(400).send('You goofed! Please input a valid email and password');
-  } else if (isEmailTaken(email)) {
-    console.log("400 error");
-    res.status(400).send("Email already registered!");
-  } else {
-  users[userID] = {id: userID, email: email, password: hash}; // <----- changing password to hashed password
-  req.session.user_ID = userID;
-  console.log(users)
-  res.redirect("/urls");
-  }
+    if (!req.body.password || !req.body.email) {
+      console.log("400 error");
+      res.status(400).send('You goofed! Please input a valid email and password');
+    } else if (isEmailTaken(email)) {
+        console.log("400 error");
+        res.status(400).send("Email already registered!");
+      } else {
+        users[userID] = {id: userID, email: email, password: hash}; // <----- changing password to hashed password
+        req.session.user_ID = userID;
+        console.log(users)
+        res.redirect("/urls");
+      }
 });
 
 app.post("/urls/:id/delete", (req, res) => {
@@ -180,8 +154,8 @@ app.post("/urls/:id/delete", (req, res) => {
     delete urlDatabase[req.params.id]
     res.redirect("/urls")
   } else {
-    res.status(550).send("You can't do that");
-  }
+      res.status(550).send("You can't do that");
+    }
 });
 
 app.get("/urls/:id", (req, res) => {
@@ -194,20 +168,19 @@ app.get("/urls/:id", (req, res) => {
     res.render("urls_show", templateVars);
   } else {
     res.status(550).send("You can't do that");
-  }
+    }
  });
 
 app.post("/urls/:id", (req, res) => {
   var newLongURL = req.body.longURL;
   urlDatabase[req.params.id].longURL = newLongURL;
-  console.log("this is from the post urls :id section: " + urlDatabase[newLongURL]);
   res.redirect("/urls");
 });
 
 app.post("/urls", (req, res) => {
   var shortURL = rando();
-  let longURL = req.body.longURL; // < ---- input of long URL
-  let userID = req.session["user_ID"] // < ---- logged in user's ID
+  let longURL = req.body.longURL; 
+  let userID = req.session["user_ID"];
   urlDatabase[shortURL] = {id: shortURL, longURL: longURL, userID: userID};
   console.log(urlDatabase);
   res.redirect("/urls/" + shortURL);
@@ -238,15 +211,13 @@ app.listen(PORT, () => {
 function passwordCheck(email, password) {
   for (var userID in users) {
     if (email === users[userID].email) {
-      // if (password === users[userID].password) {
       if (bcrypt.compareSync(password, users[userID].password)) {
-        return users[userID]; //<----- changed it
+        return users[userID];
       }
-    return false;
+      return false;
     }
   }
-}
-// console.log(bcrypt.compareSync(password, users[userID].password));
+};
 
 function isEmailTaken(email) {
   for (var userID in users) {
@@ -255,7 +226,7 @@ function isEmailTaken(email) {
     }
   }
   return false;
-}
+};
 
 function urlsForUser(id) {
   let userURLs = {};
@@ -265,4 +236,4 @@ function urlsForUser(id) {
     }
   }
   return userURLs;
-}
+};

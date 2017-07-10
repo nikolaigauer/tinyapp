@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <title>TinyApp</title>
-</head>
-<body>
-  <% include ../views/partials/_header %>
-  <ul>
-    <li> <%= shortURL %> </li>
-  </ul>
-  <form method="POST" action='/urls/<%= shortURL %>'>
-    <label for="longURL">Update your URL:</label>
-    <input id="longURL" type="text" name="longURL" placeholder="http://" style="width: 300px">
-    <input type="submit" value="Submit">
-  </form>
-</body>
+  <head>
+    <title>TinyApp</title>
+  </head>
+    <body style="font-size:20px; padding:50px;">
+      <% include ../views/partials/_header %>
+        <ul>
+          <li> <%= shortURL %> </li>
+        </ul>
+        <form method="POST" action='/urls/<%= shortURL %>'>
+          <label for="longURL">Update your URL:</label>
+          <input id="longURL" type="text" name="longURL" placeholder="http://" style="width: 300px">
+          <input type="submit" value="Submit">
+        </form>
+    </body>
 </hmtl>

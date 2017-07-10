@@ -1,22 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
+
+
+
 <head>
   <title>TinyApp</title>
 </head>
 <header>
   <% include partials/_header %>
 </header>
-<body>
+<body style="font-size:20px; padding:50px;">
 
   <ul>
     <% for (var shortURL in urlDatabase) { %>
       <li>
         <div>
-          key/Short: <%= shortURL %>
+          Short URL: <%= shortURL %>
         </div>
 
         <div>
-          value/URL:
+          Original URL:
           <a href='/u/<%= shortURL %>'>
             <%= urlDatabase[shortURL].longURL %>
           </a>
