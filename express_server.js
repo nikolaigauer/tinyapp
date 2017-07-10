@@ -1,7 +1,9 @@
+"use strict"
 var express = require("express");
 var app = express();
 // var cookieParser = require('cookie-parser')
 var cookieSession = require('cookie-session')
+const bcrypt = require('bcrypt')
 
 var PORT = process.env.PORT || 8080; // default port 8080
 
@@ -87,7 +89,6 @@ app.post("/urls/new", (req, res) => {
 });
 
 app.get("/login", (req, res) => {
-  // let password = req.body.password
   let templateVars = {
     user: users[req.session["user_ID"]]
   };
@@ -99,21 +100,36 @@ app.get("/login", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-  let password = req.body.password
-  let email = req.body.email
+  let password = req.body.password;
+  let email = req.body.email;
+
+
+  // let saltRounds = 10;
+  // var salt = bcrypt.genSaltSync(saltRounds);
+  // var hash = bcrypt.hashSync(password, salt);
+  // console.log(hash);
+  // let hashed_password = (bcrypt.compareSync(password, 10))
+
+//   if (bcrypt.compareSync(password, hash)) {
+//   console.log("The password is a match!");
+// } else {
+//   console.log("You suck at passwords.");
+// }
+// console.log(bcrypt.compareSync(password, hashed_password)); // hashed_password need to refer to the object it is stored in
+
   if (!req.body.password || !req.body.email) {
     console.log("403 error");
     res.status(403).send('Please input a valid email and password');
   } else if (!isEmailTaken(email)) {
     console.log("403 error");
     res.status(403).send('The input email is not in our database');
-  } else if (passwordCheck(email, password)) {
-    let user = passwordCheck(email, password)
-    req.session.user_ID= userID;
+  } else if (passwordCheck(email, password)) { // replaced password with hash
+    let user = passwordCheck(email, password);
+    req.session.user_ID = user.id; //<---- not defined!! see windows original, have changed
     res.redirect("/urls");
   } else {
     console.log("403 error");
-    res.status(403).send("The email and password does not seem to match")
+    res.status(403).send("The email and password do not seem to match");
   }
 });
 
@@ -131,7 +147,17 @@ app.get("/register", (req, res) => {
 });
 
 app.post("/register", (req, res) => {
-  let password = req.body.password;
+  const password = req.body.password; // you will probably this from req.params
+  const hashed_password = bcrypt.hashSync(password, 10);
+  console.log("this is hashed pw: " + hashed_password);
+
+let saltRounds = 10;
+var salt = bcrypt.genSaltSync(saltRounds);
+var hash = bcrypt.hashSync(password, salt);
+console.log("this is hash: " + hash);
+console.log("this is password and hash: " + bcrypt.compareSync(password, hash));
+
+  // let password = req.body.password;
   let email = req.body.email;
   let userID = rando();
   // console.log(passsword, email, userID)
@@ -142,8 +168,8 @@ app.post("/register", (req, res) => {
     console.log("400 error");
     res.status(400).send("Email already registered!");
   } else {
-  users[userID] = {id: userID, email: email, password: password}
-  req.session.user_ID= userID;
+  users[userID] = {id: userID, email: email, password: hash}; // <----- changing password to hashed password
+  req.session.user_ID = userID;
   console.log(users)
   res.redirect("/urls");
   }
@@ -208,17 +234,19 @@ app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
 
-// Helper functions below:
+//Helper functions below:
 function passwordCheck(email, password) {
   for (var userID in users) {
     if (email === users[userID].email) {
-      if (password === users[userID].password) {
-        return users[userID];
+      // if (password === users[userID].password) {
+      if (bcrypt.compareSync(password, users[userID].password)) {
+        return users[userID]; //<----- changed it
       }
     return false;
     }
   }
 }
+// console.log(bcrypt.compareSync(password, users[userID].password));
 
 function isEmailTaken(email) {
   for (var userID in users) {
